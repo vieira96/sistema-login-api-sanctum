@@ -82,6 +82,42 @@ class AuthController extends Controller
         ]);
     }
 
+    public function update(Request $request) {
+        
+        $rules = [ 
+            'name' => ['required'],
+            'confirm_password' => ['required_with:password', 'same:password']
+        ];
+        $validator = Validator::make($request->all(), $rules);
+        if($validator->fails()) {
+            return response()->json([
+                'error' => $validator->errors()->first()
+            ]);
+        }
+        $user = $request->user();
+        $user->name = $request->name;
+        if($request->password) {
+            $user->password = $request->password;
+        } else { 
+            $user->password = $user->password;
+        }
+        $user->save();
+
+        return response()->json([
+            'success' => 'Usuário atualizado com sucesso.'
+        ]);
+        
+    }
+
+    public function delete(Request $request) {
+        $user = $request->user();
+        $user->delete();
+        
+        return response()->json([
+            'success' => 'usuario deletado com sucesso'
+        ]);
+    }
+
     public function unauthorized() {
         return response()->json([
             'erro' => 'deu ruim'
@@ -98,7 +134,12 @@ class AuthController extends Controller
         ]);
     }
 
-    public function validaToken($token) {
-
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'token' => $token,
+            'token_type' => 'bearer',
+            'error' => ''
+        ]);
     }
 }

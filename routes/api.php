@@ -16,17 +16,19 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
-Route::get('/401', [AuthController::class, 'unauthorized'])->name('login');
-
-Route::middleware('auth:sanctum')->get('/auth/user', function(){
-    return response()->json([
+Route::middleware('auth:sanctum')->group(function () {
+    Route::delete('/auth/delete', [AuthController::class, 'delete']);
+    Route::put('/auth/edit', [AuthController::class, 'update']);
+    Route::get('/auth/logout', [AuthController::class, 'logout']);
+    Route::get('/auth/user', function(){
+        return response()->json([
         'user' => Auth::user()
-    ]);
+        ]);
+    });
 });
 
+Route::get('/401', [AuthController::class, 'unauthorized'])->name('login');
 Route::post('/auth/register', [AuthController::class, 'create']);
-
-Route::middleware('auth:sanctum')->get('/auth/logout', [AuthController::class, 'logout']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 
 
